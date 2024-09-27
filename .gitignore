@@ -47,8 +47,8 @@ dmypy.json
 cython_debug/
 
 # Data (.csv files are heavy)
-data/in/*.csv
-data/out/*.csv
+data/**/*.csv
+data/**/*.min
 
 # CatBoost model stuff
 jupyters/catboost_info/*
