@@ -1,0 +1,23 @@
+{
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "indentRainbow.ignoreErrorLanguages": [
+        "markdown",
+    ],
+    "autoDocstring.docstringFormat": "numpy",
+    "autoDocstring.quoteStyle": "\"\"\"",
+    "autoDocstring.startOnNewLine": true,
+    // "python.linting.mypyEnabled": true,
+    // "python.linting.mypyArgs": [
+    //     "--ignore-missing-imports",
+    //     "--follow-imports=silent",
+    //     "--show-column-numbers",
+    //     "--disallow-untyped-defs",
+    //     "--disallow-untyped-calls"
+    // ],
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "workbench.colorTheme": "Night Owl",
+    "window.zoomLevel": 1,
+}
