@@ -3,7 +3,7 @@ A research project aiming to apply machine learning models for regional Global N
 
 ## Table of Contents
 
-- [What is it?](#what-is-it?)
+- [What is it?](#what-is-it)
 
 - [How can I run it?](#how-can-i-run-it)
 
