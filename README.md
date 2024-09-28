@@ -1,5 +1,5 @@
 # Scintill-AI
-A research project aiming to apply machine learning models for regional GNSS scintillation forecasting at low latitudes
+A research project aiming to apply machine learning models for regional Global Navigation Satellite System (**GNSS**) **ionospheric scintillation forecasting** at low latitudes.
 
 ## How can I run it?
 
@@ -15,7 +15,7 @@ A research project aiming to apply machine learning models for regional GNSS sci
 
 ## How can I help?
 
-Contributions are what make the open source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community an amazing place to learn, inspire, and create. Any contribution you make is **greatly appreciated**.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
