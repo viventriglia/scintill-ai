@@ -39,9 +39,23 @@ def read_iaga_file(file_path: Path, **kwargs) -> pd.DataFrame:
 
     return df.drop(columns=["date", "time", "doy", "g"]).set_index("datetime")
 
+
 def get_magnetometer_data(data_path: Path) -> pd.DataFrame:
+    """
+    Convenience function to generate a single DataFrame containing the time series of a magnetometer's measurements
+
+    Parameters
+    ----------
+    data_path : Path
+        Input data path (including magnetometer acronym)
+
+    Returns
+    -------
+    pd.DataFrame
+    """
     data = dict()
     station = data_path.stem
+    # Get list of years by scanning sub-directories (assuming they're named by year)
     years_list = [int(dir_.stem) for dir_ in data_path.iterdir()]
     years = range(years_list[0], years_list[-1] + 1)
 
@@ -51,10 +65,10 @@ def get_magnetometer_data(data_path: Path) -> pd.DataFrame:
         if not year_dir.exists():
             continue
 
-        # Scorriamo i file della directory che corrispondono al pattern 'kouYYYYMMDDdmin.min'
-        for file_path in year_dir.glob(f'{station.lower()}{yr_}*.min'):
+        # Loop through files matching 'xxxYYYMMDDdmin.min' (per station and year)
+        for file_path in year_dir.glob(f"{station.lower()}{yr_}*.min"):
             df = read_iaga_file(file_path, na_values=[99999.00])
-            
+
             if yr_ not in data:
                 data[yr_] = [df]
             else:
