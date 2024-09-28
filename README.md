@@ -1,6 +1,26 @@
 # Scintill-AI
 A research project aiming to apply machine learning models for regional Global Navigation Satellite System (**GNSS**) **ionospheric scintillation forecasting** at low latitudes.
 
+## Table of Contents
+
+- [What is it?](#what-is-it?)
+
+- [How can I run it?](#how-can-i-run-it)
+
+- [How can I help?](#how-can-i-help)
+
+- [Data](#data) 
+
+## What is it?
+
+The ionosphere contains ionised particles that are generally homogeneously distributed, and GNSS receivers – which use the signals from satellites orbiting the Earth to calculate their locations – can account for their effect on satellite signals using models. However, problems arise when there are irregularities, *i.e.* **localised fluctuations in the electron density** of the ionosphere, which can distort the phase and amplitude of GNSS signals, producing fluctuations known as *scintillations*.
+
+The appearance of scintillation is often deemed unpredictable. It varies throughout the day, with sunset triggering a sharp increase in ionospheric activity that can last several hours. Also, an increase in solar activity can produce scintillation events that can **degrade the quality of satellite signals**. In standard GNSS receivers, a mild scintillation can degrade position accuracy by up to several metres. More severe scintillation can cause cycle slips or, in the most extreme cases, total loss of signal lock. So, whether it comes to precision agriculture in Brazil, oil exploration in Alaska or a large construction project in Singapore, it is highly beneficial to forecast the onset of scintillation.
+
+| ![Cars and a plane on a sunset sky](images/scintill_ai_cover.jpeg) | 
+|:--:| 
+| *Generated image of cars and an aircraft under a sunset sky* |
+
 ## How can I run it?
 
 - First, you need to clone the repo and install **dependencies** via [poetry](https://python-poetry.org/docs/) with `poetry install`
