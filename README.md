@@ -51,4 +51,5 @@ An (hopefully) up-to-date list of things to do can be found [here](https://githu
 
 ## Data
 
-- [INTERMAGNET](https://imag-data.bgs.ac.uk/GIN_V1/GINForms2?observatoryIagaCode=KOU&publicationState=Best+available&dataStartDate=2014-01-01&dataDuration=10&submitValue=Bulk+Download+...&request=DataView&samplesPerDay=minute): ground-based magnetometers in Kourou (KOU, French Guiana) and Tatuoca (TTB, Brazil)
+- [INTERMAGNET](https://imag-data.bgs.ac.uk/GIN_V1/GINForms2?observatoryIagaCode=KOU&publicationState=Best+available&dataStartDate=2014-01-01&dataDuration=10&submitValue=Bulk+Download+...&request=DataView&samplesPerDay=minute): ground-based magnetometers in Kourou (KOU, French Guiana) and Tatuoca (TTB, Brazil). To download the raw data, open a unix shell, cd into `scripts` and execute `./download.sh`, which will download the raw data into the `./data/in` directory.
+- [GFZ Potsdam](https://kp.gfz-potsdam.de/app/files/Kp_ap_Ap_SN_F107_since_1932.txt): solar indices data can be downloaded directly via the `scintill_ai.io` module.
