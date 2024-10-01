@@ -49,6 +49,7 @@ cython_debug/
 # Data (.csv files are heavy)
 data/**/*.csv
 data/**/*.min
+data/**/*.txt
 
 # CatBoost model stuff
 jupyters/catboost_info/*
@@ -57,5 +58,5 @@ jupyters/catboost_info/*
 # /mlruns/*
 
 # Markdown
-*.md
-!README.md
+# *.md
+# !README.md
