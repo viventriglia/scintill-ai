@@ -1,6 +1,7 @@
 from pathlib import Path
 from io import StringIO
 import requests
+import re
 
 import pandas as pd
 import numpy as np
@@ -41,6 +42,74 @@ def read_iaga_file(file_path: Path, **kwargs) -> pd.DataFrame:
     df["datetime"] = pd.to_datetime(df["date"] + " " + df["time"])
 
     return df.drop(columns=["date", "time", "doy", "g"]).set_index("datetime")
+
+
+def read_omniweb_file(file_path: Path) -> pd.DataFrame:
+    """
+    Convenience function to read time-series data from NASA OMNIWeb service
+
+    Parameters
+    ----------
+    file_path : Path
+        Input file path
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    with open(file_path, "r") as f:
+        content = f.read()
+        content_no_tags = re.sub(r"<.*?>", "", content)
+        lines = content_no_tags.strip().split("\n")
+
+    COLS = [
+        "year",
+        "doy",
+        "hour",
+        "minute",
+        "field_magnitude_avg",
+        "wind_speed",
+        "wind_density",
+        "wind_pressure",
+        "eletric_field",
+    ]
+
+    COLWISE_NAN = {
+        "field_magnitude_avg": {9999.99: np.nan},
+        "wind_speed": {99999.9: np.nan},
+        "wind_density": {999.99: np.nan},
+        "wind_pressure": {99.99: np.nan},
+        "eletric_field": {999.99: np.nan},
+    }
+
+    # Handling files without data (return empy DataFrame)
+    try:
+        header_line = next(line for line in lines if line.startswith("YYYY DOY HR MN"))
+    except StopIteration:
+        return pd.DataFrame()
+
+    data = []
+    for line in lines[lines.index(header_line) + 1 :]:
+        # Keeping rows that are not empty and begin with a year (4 digits)
+        if line.strip() and re.match(r"^\d{4}", line):
+            values = line.split()
+            data.append(dict(zip(COLS, values)))
+
+    df = pd.DataFrame(data)
+
+    df["datetime"] = pd.to_datetime(
+        df["year"] + df["doy"] + df["hour"] + df["minute"],
+        format="%Y%j%H%M",
+    )
+
+    df = (
+        df.drop(columns=["year", "doy", "hour", "minute"])
+        .set_index("datetime")
+        .astype(float)
+        .replace(COLWISE_NAN)
+    )
+
+    return df
 
 
 def get_magnetometer_data(data_path: Path) -> pd.DataFrame:
@@ -145,3 +214,32 @@ def get_solar_data(start_date: str, end_date: str) -> pd.DataFrame:
     df = df.drop(columns=["year", "month", "day"]).set_index("date")
 
     return df.loc[start_date:end_date]
+
+
+def get_solar_wind_data(data_path: Path) -> pd.DataFrame:
+    """
+    Convenience function to generate a single DataFrame containing the time series of solar wind measurements
+
+    Parameters
+    ----------
+    data_path : Path
+        Input data path
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    data = dict()
+    # Get list of years by scanning files in the directory
+    years_list = [int(file_.stem) for file_ in data_path.iterdir()]
+    years = range(years_list[0], years_list[-1] + 1)
+
+    for yr_ in years:
+        year_file = Path(data_path, f"{yr_}.txt")
+
+        if not year_file.is_file():
+            continue
+
+        data[yr_] = read_omniweb_file(year_file)
+
+    return pd.concat([data[yr_] for yr_ in years])
