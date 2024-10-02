@@ -51,5 +51,10 @@ An (hopefully) up-to-date list of things to do can be found [here](https://githu
 
 ## Data
 
-- [INTERMAGNET](https://imag-data.bgs.ac.uk/GIN_V1/GINForms2?observatoryIagaCode=KOU&publicationState=Best+available&dataStartDate=2014-01-01&dataDuration=10&submitValue=Bulk+Download+...&request=DataView&samplesPerDay=minute): ground-based magnetometers in Kourou (KOU, French Guiana) and Tatuoca (TTB, Brazil). To download the raw data, open a unix shell, cd into `scripts` and execute `./download.sh`, which will download the raw data into the `./data/in` directory.
+- [INTERMAGNET](https://imag-data.bgs.ac.uk/GIN_V1/GINForms2?observatoryIagaCode=KOU&publicationState=Best+available&dataStartDate=2014-01-01&dataDuration=10&submitValue=Bulk+Download+...&request=DataView&samplesPerDay=minute): ground-based magnetometers in Kourou (KOU, French Guiana) and Tatuoca (TTB, Brazil). To download the raw data, open a unix shell, cd into `scripts` and execute `./download_magnetometer_data.sh`, which will download the raw data into the `./data/in` directory.
+
+- [ISMR](https://ismrquerytool.fct.unesp.br/is/index.php#): GNSS receiver in Presidente Prudente (PRU2, Brazil). The access to the API is exclusive for authorized researchers and a unique key is required. Your key is provided when you access [the webservice](https://ismrquerytool.fct.unesp.br/is/ismrtool/manual/mkdocs-ismrtools/webservice/); once you have it, place it in the `.env.shared` file and rename it to `.env.secret`.
+
+- [OMNIWeb](https://omniweb.gsfc.nasa.gov/form/omni_min.html): field and plasma data shifted to the Earth's bow shock nose. To download the raw data, open a unix shell, cd into `scripts` and execute `./download_omniweb_data.sh`, which will download the raw data into the `./data/in/omniweb` directory. [Here](./scripts/download_omniweb_data_vars.md) a (partial) list of fields available for download.
+
 - [GFZ Potsdam](https://kp.gfz-potsdam.de/app/files/Kp_ap_Ap_SN_F107_since_1932.txt): solar indices data can be downloaded directly via the `scintill_ai.io` module.
