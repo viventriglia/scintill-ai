@@ -7,6 +7,7 @@ from time import sleep
 
 import pandas as pd
 import numpy as np
+from dotenv import dotenv_values
 
 from scintill_ai.utils import progressbar
 
@@ -250,7 +251,10 @@ def get_solar_wind_data(data_path: Path) -> pd.DataFrame:
 
 
 def get_gnss_data(
-    start: str, end: str, station_name: str, fields: str, api_key: str
+    start: str,
+    end: str,
+    station_name: str,
+    fields: str,
 ) -> pd.DataFrame:
     """
     Convenience function to read GNSS receivers data from a station in the ISMR network
@@ -265,17 +269,16 @@ def get_gnss_data(
         Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
     fields : str
         Columns for a customizable return
-    api_key : str
-        Authentication key
 
     Returns
     -------
     pd.DataFrame
     """
+    ISMR_KEY = dotenv_values("../.env.secret")["ISMR_KEY"]
     fields_no_space = ",".join(s_.strip() for s_ in fields.split(","))
 
     url = f"http://is-cigala-calibra.fct.unesp.br/is/ismrtool/calc-var/service_loadISMR.php"
-    url += f"?date_begin={quote(start)}&date_end={quote(end)}&stationName={station_name.strip()}&field_list={fields_no_space}&mode=csv&key={quote(api_key.strip())}"
+    url += f"?date_begin={quote(start)}&date_end={quote(end)}&stationName={station_name.strip()}&field_list={fields_no_space}&mode=csv&key={quote(ISMR_KEY.strip())}"
 
     try:
         df = pd.read_csv(url)
@@ -286,7 +289,10 @@ def get_gnss_data(
 
 
 def get_gnss_data_gently(
-    start: str, end: str, station_name: str, fields: str, api_key: str
+    start: str,
+    end: str,
+    station_name: str,
+    fields: str,
 ) -> pd.DataFrame:
     """
     Convenience function to read GNSS receivers data from a station in the ISMR network,
@@ -302,8 +308,6 @@ def get_gnss_data_gently(
         Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
     fields : str
         Columns for a customizable return
-    api_key : str
-        Authentication key
 
     Returns
     -------
@@ -315,7 +319,7 @@ def get_gnss_data_gently(
         dt_begin = dt_.strftime("%Y-%m-%d 00:00:00")
         dt_end = dt_.strftime("%Y-%m-%d 23:59:00")
 
-        dfs.append(get_gnss_data(dt_begin, dt_end, station_name, fields, api_key))
+        dfs.append(get_gnss_data(dt_begin, dt_end, station_name, fields))
         sleep(np.random.random() / 2)
 
     return pd.concat(dfs, ignore_index=True)
