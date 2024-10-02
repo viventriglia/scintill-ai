@@ -1,10 +1,14 @@
 from pathlib import Path
 from io import StringIO
+from urllib.parse import quote
 import requests
 import re
+from time import sleep
 
 import pandas as pd
 import numpy as np
+
+from scintill_ai.utils import progressbar
 
 
 def read_iaga_file(file_path: Path, **kwargs) -> pd.DataFrame:
@@ -243,3 +247,75 @@ def get_solar_wind_data(data_path: Path) -> pd.DataFrame:
         data[yr_] = read_omniweb_file(year_file)
 
     return pd.concat([data[yr_] for yr_ in years])
+
+
+def get_gnss_data(
+    start: str, end: str, station_name: str, fields: str, api_key: str
+) -> pd.DataFrame:
+    """
+    Convenience function to read GNSS receivers data from a station in the ISMR network
+
+    Parameters
+    ----------
+    start : str
+        Start date-time in 'YYYY-MM-DD HH:MM:SS' format
+    end : str
+        End date-time in 'YYYY-MM-DD HH:MM:SS' format
+    station_name : str
+        Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
+    fields : str
+        Columns for a customizable return
+    api_key : str
+        Authentication key
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    fields_no_space = ",".join(s_.strip() for s_ in fields.split(","))
+
+    url = f"http://is-cigala-calibra.fct.unesp.br/is/ismrtool/calc-var/service_loadISMR.php"
+    url += f"?date_begin={quote(start)}&date_end={quote(end)}&stationName={station_name.strip()}&field_list={fields_no_space}&mode=csv&key={quote(api_key.strip())}"
+
+    try:
+        df = pd.read_csv(url)
+        return df
+    except Exception as e:
+        # print(e)
+        return pd.DataFrame(columns=[f_.strip() for f_ in fields.split(",")])
+
+
+def get_gnss_data_gently(
+    start: str, end: str, station_name: str, fields: str, api_key: str
+) -> pd.DataFrame:
+    """
+    Convenience function to read GNSS receivers data from a station in the ISMR network,
+    while avoiding hitting servers with massive requests
+
+    Parameters
+    ----------
+    start : str
+        Start date in 'YYYY-MM-DD' format (day starts at 00:00)
+    end : str
+        End date in 'YYYY-MM-DD' format (day ends at 23:59)
+    station_name : str
+        Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
+    fields : str
+        Columns for a customizable return
+    api_key : str
+        Authentication key
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    date_range = pd.date_range(start, end)
+    dfs = []
+    for dt_ in progressbar(date_range, prefix="Downloading -- time for a ☕ "):
+        dt_begin = dt_.strftime("%Y-%m-%d 00:00:00")
+        dt_end = dt_.strftime("%Y-%m-%d 23:59:00")
+
+        dfs.append(get_gnss_data(dt_begin, dt_end, station_name, fields, api_key))
+        sleep(np.random.random() / 2)
+
+    return pd.concat(dfs, ignore_index=True)
