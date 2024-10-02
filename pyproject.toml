@@ -17,6 +17,7 @@ seaborn = "^0.13.2"
 pvlib = "^0.11.1"
 black = "^24.8.0"
 jupyter = "^1.0.0"
+python-dotenv = "^1.0.1"
 
 
 [build-system]
