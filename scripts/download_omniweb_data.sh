@@ -2,7 +2,7 @@
 
 mkdir -p ../data/in/omniweb
 
-vars=(13 21 25 27 28)
+vars=(4 5 13 21 25 27 28)
 
 vars_string=""
 for var in "${vars[@]}"; do

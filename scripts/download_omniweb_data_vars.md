@@ -1,6 +1,7 @@
 | `vars`| Description                   | Use? |
 | ----- | ----------------------------- | ---- |
-| 4     | ID for IMF spacecraft         ||
+| 4     | ID for IMF spacecraft         |✔|
+| 5     | ID for IMF spacecraft         |✔|
 | 13    | Field magnitude average, nT   |✔|
 | 14    | BX, nT (GSE, GSM)             ||
 | 15    | BY, nT (GSE)                  ||
