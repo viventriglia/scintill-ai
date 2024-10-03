@@ -72,6 +72,8 @@ def read_omniweb_file(file_path: Path) -> pd.DataFrame:
         "doy",
         "hour",
         "minute",
+        "id_imf_spacecraft",
+        "id_swp_spacecraft",
         "field_magnitude_avg",
         "wind_speed",
         "wind_density",
@@ -80,6 +82,8 @@ def read_omniweb_file(file_path: Path) -> pd.DataFrame:
     ]
 
     COLWISE_NAN = {
+        "id_imf_spacecraft": {99: np.nan},
+        "id_swp_spacecraft": {99: np.nan},
         "field_magnitude_avg": {9999.99: np.nan},
         "wind_speed": {99999.9: np.nan},
         "wind_density": {999.99: np.nan},
@@ -103,7 +107,10 @@ def read_omniweb_file(file_path: Path) -> pd.DataFrame:
     df = pd.DataFrame(data)
 
     df["datetime"] = pd.to_datetime(
-        df["year"] + df["doy"] + df["hour"] + df["minute"],
+        df["year"]
+        + df["doy"].str.pad(3, fillchar="0")
+        + df["hour"].str.pad(2, fillchar="0")
+        + df["minute"].str.pad(2, fillchar="0"),
         format="%Y%j%H%M",
     )
 
@@ -223,7 +230,8 @@ def get_solar_data(start_date: str, end_date: str) -> pd.DataFrame:
 
 def get_solar_wind_data(data_path: Path) -> pd.DataFrame:
     """
-    Convenience function to generate a single DataFrame containing the time series of solar wind measurements
+    Convenience function to generate a single DataFrame containing the time series
+    of OMNIWeb solar wind measurements
 
     Parameters
     ----------
