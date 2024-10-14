@@ -9,7 +9,9 @@ import pandas as pd
 import numpy as np
 from dotenv import dotenv_values
 
+from . import ELEVATION_THRESHOLD, LW_S4_THRESHOLD, UP_S4_THRESHOLD
 from scintill_ai.utils import progressbar
+from scintill_ai.preprocess import preprocess_S4_data
 
 
 def read_iaga_file(file_path: Path, **kwargs) -> pd.DataFrame:
@@ -296,15 +298,16 @@ def get_gnss_data(
         return pd.DataFrame(columns=[f_.strip() for f_ in fields.split(",")])
 
 
-def get_gnss_data_gently(
+def get_aggregated_gnss_data(
     start: str,
     end: str,
     station_name: str,
     fields: str,
 ) -> pd.DataFrame:
     """
-    Convenience function to read GNSS receivers data from a station in the ISMR network,
-    while avoiding hitting servers with massive requests
+    Convenience function to get GNSS aggregated data (mean and max S4 for satellites
+    above a set elevation, e.g. 60°) from a station in the ISMR network, while avoiding
+    hitting servers with massive requests
 
     Parameters
     ----------
@@ -327,7 +330,16 @@ def get_gnss_data_gently(
         dt_begin = dt_.strftime("%Y-%m-%d 00:00:00")
         dt_end = dt_.strftime("%Y-%m-%d 23:59:00")
 
-        dfs.append(get_gnss_data(dt_begin, dt_end, station_name, fields))
+        df_raw = get_gnss_data(dt_begin, dt_end, station_name, fields)
+        dfs.append(
+            preprocess_S4_data(
+                df=df_raw,
+                elevation_threshold=ELEVATION_THRESHOLD,
+                lower_S4_threshold=LW_S4_THRESHOLD,
+                higher_S4_threshold=UP_S4_THRESHOLD,
+            )
+        )
+        # Let's wait a bit between requests
         sleep(np.random.random() / 2)
 
     return pd.concat(dfs, ignore_index=True)
