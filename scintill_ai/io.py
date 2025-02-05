@@ -7,7 +7,7 @@ from time import sleep
 
 import pandas as pd
 import numpy as np
-from dotenv import dotenv_values
+from netCDF4 import Dataset
 
 from . import ISMR_KEY, ELEVATION_THRESHOLD, LW_S4_THRESHOLD, UP_S4_THRESHOLD
 from scintill_ai.utils import progressbar
@@ -126,9 +126,10 @@ def read_omniweb_file(file_path: Path) -> pd.DataFrame:
     return df
 
 
-def get_magnetometer_data(data_path: Path) -> pd.DataFrame:
+def _get_magnetometer_data(data_path: Path) -> pd.DataFrame:
     """
-    Convenience function to generate a single DataFrame containing the time series of a magnetometer's measurements
+    Convenience function to generate a single DataFrame containing the time series
+    of a magnetometer's measurements (INTERMAGNET)
 
     Parameters
     ----------
@@ -169,6 +170,79 @@ def get_magnetometer_data(data_path: Path) -> pd.DataFrame:
     )
 
     return df_mag
+
+
+def get_magnetometer_data(
+    file_path: Path, stations_list: list[str] = None
+) -> pd.DataFrame:
+    """
+    Convenience function to generate a DataFrame containing the time series of
+    a magnetometer's measurements, extracted from a NetCDF file (SuperMAG)
+
+    Parameters
+    ----------
+    file_path : Path
+        Path to the input NetCDF file
+    stations_list : list[str], optional
+        List of station IDs to extract; if None, all stations are used
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the horizontal magnetic field component for
+        each selected station
+    """
+    with Dataset(file_path, mode="r") as f:
+        # Extract station IDs
+        station_ids = f.variables["id"][:1][0]
+
+        # Use all stations if no specific list is provided
+        if stations_list is None:
+            cols_to_use = list(range(len(station_ids)))
+            cols_name = [s.lower() for s in station_ids]
+        else:
+            mask = np.isin(station_ids, stations_list)
+            cols_to_use = np.where(mask)[0].tolist()
+            cols_name = [station_ids[i].lower() for i in cols_to_use]
+
+        # Extract timestamps and convert to datetime
+        df_datetime = pd.DataFrame(
+            {
+                "datetime": pd.to_datetime(
+                    {
+                        "year": f.variables["time_yr"][:],
+                        "month": f.variables["time_mo"][:],
+                        "day": f.variables["time_dy"][:],
+                        "hour": f.variables["time_hr"][:],
+                        "minute": f.variables["time_mt"][:],
+                    },
+                    errors="coerce",
+                )
+            }
+        )
+
+        # Extract magnetometer data
+        variables = ["dbe_geo", "dbn_geo"]
+        df_data = pd.concat(
+            [
+                pd.DataFrame(
+                    f.variables[var_][:, cols_to_use],
+                    columns=[f"{var_}_{col}" for col in cols_name],
+                )
+                for var_ in variables
+            ],
+            axis=1,
+        )
+
+    # Compute total horizontal component (H) for each station
+    for stat_ in cols_name:
+        df_data[f"h_{stat_}"] = np.sqrt(
+            df_data[f"dbe_geo_{stat_}"] ** 2 + df_data[f"dbn_geo_{stat_}"] ** 2
+        )
+
+    return df_data[[f"h_{stat_}" for stat_ in cols_name]].set_index(
+        df_datetime["datetime"]
+    )
 
 
 def get_solar_data(start_date: str, end_date: str) -> pd.DataFrame:
