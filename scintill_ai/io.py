@@ -367,7 +367,7 @@ def get_gnss_data(
         df = pd.read_csv(url)
         return df
     except Exception as e:
-        # print(e)
+        print(f"Request to ISMR Query Tool failed: {e}")
         return pd.DataFrame(columns=[f_.strip() for f_ in fields.split(",")])
 
 
@@ -413,6 +413,6 @@ def get_aggregated_gnss_data(
             )
         )
         # Let's wait a bit between requests
-        sleep(np.random.random() / 2)
+        sleep(np.random.random() / 5)
 
     return pd.concat(dfs, ignore_index=True)

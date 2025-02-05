@@ -96,6 +96,7 @@ def preprocess_S4_data(
     return df_agg
 
 
+@np.errstate(invalid="ignore")
 def denoise_S4(s4_series: pd.Series, s4_corr_series: pd.Series) -> np.ndarray:
     """
     _summary_
@@ -132,15 +133,4 @@ def filter_higher_elevs(df: pd.DataFrame, elevation_threshold: float) -> pd.Data
     -------
     pd.DataFrame
     """
-    df_ = df.copy()
-    df_["is_high_elev"] = np.where(
-        df_["elev"].ge(elevation_threshold),
-        True,
-        False,
-    )
-
-    return (
-        df_[df_["is_high_elev"].eq(True)]
-        .drop(columns="is_high_elev")
-        .reset_index(drop=True)
-    )
+    return df[df["elev"].ge(elevation_threshold)].reset_index(drop=True)
