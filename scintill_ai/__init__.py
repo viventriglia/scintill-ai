@@ -1,6 +1,9 @@
 from pathlib import Path
 
+from dotenv import dotenv_values
+
 # GNSS (Presidente Prudente)
+ISMR_KEY = dotenv_values("../.env.secret")["ISMR_KEY"]
 LATITUDE = -22.122112
 LONGITUDE = -51.407095
 ALTITUDE = 350_000

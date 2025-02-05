@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from dotenv import dotenv_values
 
-from . import ELEVATION_THRESHOLD, LW_S4_THRESHOLD, UP_S4_THRESHOLD
+from . import ISMR_KEY, ELEVATION_THRESHOLD, LW_S4_THRESHOLD, UP_S4_THRESHOLD
 from scintill_ai.utils import progressbar
 from scintill_ai.preprocess import preprocess_S4_data
 
@@ -284,7 +284,6 @@ def get_gnss_data(
     -------
     pd.DataFrame
     """
-    ISMR_KEY = dotenv_values("../.env.secret")["ISMR_KEY"]
     fields_no_space = ",".join(s_.strip() for s_ in fields.split(","))
 
     url = f"http://is-cigala-calibra.fct.unesp.br/is/ismrtool/calc-var/service_loadISMR.php"
