@@ -51,6 +51,7 @@ cython_debug/
 data/**/*.csv
 data/**/*.min
 data/**/*.txt
+data/**/*.pickle
 data/**/*.netcdf
 
 # CatBoost model stuff
