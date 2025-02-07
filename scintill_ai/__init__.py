@@ -12,7 +12,7 @@ UP_S4_THRESHOLD: float = 0.7
 
 # ISMR
 ISMR_KEY: str = dotenv_values("../.env.secret")["ISMR_KEY"]
-MAX_CONCURRENT_REQUESTS: int = 5
+MAX_CONCURRENT_REQUESTS: int = 10
 
 # Data
 DATA_IN: Path = Path("..", "data", "in")
