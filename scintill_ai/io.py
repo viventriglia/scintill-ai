@@ -1,17 +1,11 @@
 from pathlib import Path
 from io import StringIO
-from urllib.parse import quote
 import requests
 import re
-from time import sleep
 
 import pandas as pd
 import numpy as np
 from netCDF4 import Dataset
-
-from . import ISMR_KEY, ELEVATION_THRESHOLD, LW_S4_THRESHOLD, UP_S4_THRESHOLD
-from scintill_ai.utils import progressbar
-from scintill_ai.preprocess import preprocess_S4_data
 
 
 def read_iaga_file(file_path: Path, **kwargs) -> pd.DataFrame:
@@ -332,87 +326,3 @@ def get_solar_wind_data(data_path: Path) -> pd.DataFrame:
         data[yr_] = read_omniweb_file(year_file)
 
     return pd.concat([data[yr_] for yr_ in years])
-
-
-def get_gnss_data(
-    start: str,
-    end: str,
-    station_name: str,
-    fields: str,
-) -> pd.DataFrame:
-    """
-    Convenience function to read GNSS receivers data from a station in the ISMR network
-
-    Parameters
-    ----------
-    start : str
-        Start date-time in 'YYYY-MM-DD HH:MM:SS' format
-    end : str
-        End date-time in 'YYYY-MM-DD HH:MM:SS' format
-    station_name : str
-        Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
-    fields : str
-        Columns for a customizable return
-
-    Returns
-    -------
-    pd.DataFrame
-    """
-    fields_no_space = ",".join(s_.strip() for s_ in fields.split(","))
-
-    url = f"http://is-cigala-calibra.fct.unesp.br/is/ismrtool/calc-var/service_loadISMR.php"
-    url += f"?date_begin={quote(start)}&date_end={quote(end)}&stationName={station_name.strip()}&field_list={fields_no_space}&mode=csv&key={quote(ISMR_KEY.strip())}"
-
-    try:
-        df = pd.read_csv(url)
-        return df
-    except Exception as e:
-        print(f"Request to ISMR Query Tool failed: {e}")
-        return pd.DataFrame(columns=[f_.strip() for f_ in fields.split(",")])
-
-
-def get_aggregated_gnss_data(
-    start: str,
-    end: str,
-    station_name: str,
-    fields: str,
-) -> pd.DataFrame:
-    """
-    Convenience function to get GNSS aggregated data (mean and max S4 for satellites
-    above a set elevation, e.g. 60°) from a station in the ISMR network, while avoiding
-    hitting servers with massive requests
-
-    Parameters
-    ----------
-    start : str
-        Start date in 'YYYY-MM-DD' format (day starts at 00:00)
-    end : str
-        End date in 'YYYY-MM-DD' format (day ends at 23:59)
-    station_name : str
-        Station acronym to be retrived, e.g. 'PRU2' (full list at https://ismrquerytool.fct.unesp.br/is/)
-    fields : str
-        Columns for a customizable return
-
-    Returns
-    -------
-    pd.DataFrame
-    """
-    date_range = pd.date_range(start, end)
-    dfs = []
-    for dt_ in progressbar(date_range, prefix="Downloading -- time for a ☕ "):
-        dt_begin = dt_.strftime("%Y-%m-%d 00:00:00")
-        dt_end = dt_.strftime("%Y-%m-%d 23:59:00")
-
-        df_raw = get_gnss_data(dt_begin, dt_end, station_name, fields)
-        dfs.append(
-            preprocess_S4_data(
-                df=df_raw,
-                elevation_threshold=ELEVATION_THRESHOLD,
-                lower_S4_threshold=LW_S4_THRESHOLD,
-                higher_S4_threshold=UP_S4_THRESHOLD,
-            )
-        )
-        # Let's wait a bit between requests
-        sleep(np.random.random() / 5)
-
-    return pd.concat(dfs, ignore_index=True)
