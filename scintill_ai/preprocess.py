@@ -59,6 +59,26 @@ def preprocess_S4_data(
     lower_S4_threshold: float,
     higher_S4_threshold: float,
 ) -> pd.DataFrame:
+    """
+    Preprocesses S4 data by denoising, filtering by elevation, and labelling scintillation levels.
+    This utility computes also some satellite statistics (i.e., percentage of satellites with
+    mild or strong scintillation, maximum and mean registered S4 values).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input data
+    elevation_threshold : float
+        Minimum elevation for the rows to be retained
+    lower_S4_threshold : float
+        S4 value above which the scintillation is considered mild
+    higher_S4_threshold : float
+        S4 value above which the scintillation is considered strong
+
+    Returns
+    -------
+    pd.DataFrame
+    """
     df["s4_denoised"] = denoise_S4(df["s4"], df["s4_correction"])
 
     df_high_elev = filter_higher_elevs(df, elevation_threshold)
@@ -99,14 +119,14 @@ def preprocess_S4_data(
 @np.errstate(invalid="ignore")
 def denoise_S4(s4_series: pd.Series, s4_corr_series: pd.Series) -> np.ndarray:
     """
-    _summary_
+    Denoises a given S4 signal by removing the thermal noise component
 
     Parameters
     ----------
     s4_series : pd.Series
-        _description_
+        Series containing the S4 signal values
     s4_corr_series : pd.Series
-        _description_
+        Series containing the corrections to be subtracted
 
     Returns
     -------
@@ -120,14 +140,15 @@ def denoise_S4(s4_series: pd.Series, s4_corr_series: pd.Series) -> np.ndarray:
 
 def filter_higher_elevs(df: pd.DataFrame, elevation_threshold: float) -> pd.DataFrame:
     """
-    _summary_
+    Filter data to include only rows where the elevation is greater than or equal to
+    a specified threshold
 
     Parameters
     ----------
     df : pd.DataFrame
-        _description_
+        Input data, with an 'elev' column representing the elevation
     elevation_threshold : float
-        _description_
+        Minimum elevation for the rows to be retained
 
     Returns
     -------
