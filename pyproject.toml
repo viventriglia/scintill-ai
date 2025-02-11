@@ -13,13 +13,13 @@ numpy = "^2.1.1"
 matplotlib = "^3.9.2"
 plotly = "^5.24.1"
 scikit-learn = "^1.5.2"
-seaborn = "^0.13.2"
 pvlib = "^0.11.1"
 black = "^24.8.0"
 jupyter = "^1.0.0"
 python-dotenv = "^1.0.1"
 netcdf4 = "^1.7.2"
 aiohttp = "^3.11.12"
+statsforecast = "^2.0.0"
 
 
 [build-system]
