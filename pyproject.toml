@@ -20,6 +20,8 @@ python-dotenv = "^1.0.1"
 netcdf4 = "^1.7.2"
 aiohttp = "^3.11.12"
 statsforecast = "^2.0.0"
+statsmodels = "^0.14.4"
+mapie = "^0.9.2"
 
 
 [build-system]

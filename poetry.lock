@@ -1960,6 +1960,23 @@ files = [
 ]
 
 [[package]]
+name = "mapie"
+version = "0.9.2"
+description = "A scikit-learn-compatible module for estimating prediction intervals."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "MAPIE-0.9.2-py3-none-any.whl", hash = "sha256:765794fa2c5f9e9ade3656d9a6d4712ebb89bd5e3962d69e614f72abe0e19bd0"},
+    {file = "MAPIE-0.9.2.tar.gz", hash = "sha256:4adc6d346e3b607d138ba8add5a2aaa28906e6137fdf1e9e3d58951eb37b1003"},
+]
+
+[package.dependencies]
+numpy = ">=1.21"
+packaging = "*"
+scikit-learn = "<1.6.0"
+scipy = "*"
+
+[[package]]
 name = "markupsafe"
 version = "2.1.5"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -4232,4 +4249,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "26c737d2279158becbc7a4026bbd0813ebb7f9ed688dab629bcf3c963463455f"
+content-hash = "890a8cb828e9658de9e5176f3b3cbeef2de0fbc44dfca1a1f0c310da506c1290"
