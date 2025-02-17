@@ -16,3 +16,7 @@ MAX_CONCURRENT_REQUESTS: int = 10
 
 # Data
 DATA_IN: Path = Path("..", "data", "in")
+
+# EnbPI & ACI
+ALPHAS = [1 - 0.80, 1 - 0.90, 1 - 0.95]
+GAP = 30
