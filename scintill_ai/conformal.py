@@ -99,7 +99,7 @@ def aci_ts_regressor_predict(
             y_pis[step : step + forecast_horizon, :, :] = np.clip(
                 a=y_pis[step : step + forecast_horizon, :, :],
                 a_min=0,
-                a_max=1,
+                a_max=1.2,
             )
 
         results.append(
