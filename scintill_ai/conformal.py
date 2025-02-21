@@ -52,6 +52,7 @@ def aci_ts_regressor_predict(
     cv: BlockBootstrap,
     train_data: tuple[pd.DataFrame, pd.Series],
     test_data: tuple[pd.DataFrame, pd.Series],
+    update_calibration: bool = False,
     alpha_list: list[float] = ALPHAS,
     forecast_horizon: int = FCST_HORIZON,
     gamma: float = GAMMA,
@@ -75,6 +76,11 @@ def aci_ts_regressor_predict(
         )
 
         for step in range(forecast_horizon, test_data[0].shape[0], forecast_horizon):
+            if update_calibration:
+                ts_regressor.partial_fit(
+                    test_data[0].iloc[(step - forecast_horizon) : step, :].to_numpy(),
+                    test_data[1].iloc[(step - forecast_horizon) : step].to_numpy(),
+                )
             ts_regressor.adapt_conformal_inference(
                 test_data[0].iloc[(step - forecast_horizon) : step, :].to_numpy(),
                 test_data[1].iloc[(step - forecast_horizon) : step].to_numpy(),
