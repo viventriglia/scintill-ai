@@ -57,7 +57,39 @@ def aci_ts_regressor_predict(
     forecast_horizon: int = FCST_HORIZON,
     gamma: float = GAMMA,
 ) -> dict:
+    """
+    Perform time series forecasting using a MAPIE regressor with Adaptive Conformal Inference
+    (ACI). Please refer to Gibbs, Candes, NeurIPS Proceedings (2021).
 
+    Parameters
+    ----------
+    model : RegressorMixin
+        scikit-learn regression model to be trained and used for predictions
+    cv : BlockBootstrap
+        Block bootstrapping method for model calibration
+    train_data : tuple[pd.DataFrame, pd.Series]
+        Training data containing a DataFrame of features and a Series of target values
+    test_data : tuple[pd.DataFrame, pd.Series]
+        Test data containing a DataFrame of features and a Series of target values
+    update_calibration : bool, optional
+        Whether to update model calibration (conformity scores) when new data with known
+        labels are available, by default False
+    alpha_list : list[float], optional
+        List of alphas (error rates, or 1 - CL) for conformal prediction intervals, by default
+        [0.20, 0.10, 0.05]
+    forecast_horizon : int, optional
+        Number of time steps after which the prediction interval is adapted when new labeled
+        data become available, by default 5
+    gamma : float, optional
+        Step size parameter γ>0 for conformal inference, by default 0.05; this parameter
+        gives a tradeoff between adaptability and stability of the prediction intervals
+
+    Returns
+    -------
+    dict
+        Dictionary containing predicted values, prediction intervals and evaluation metrics
+        for each alpha (error rate) value
+    """
     ts_regressor = fit_mapie_regressor(
         model=model, method="aci", cv=cv, train_data=train_data
     )
