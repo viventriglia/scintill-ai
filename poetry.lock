@@ -2523,6 +2523,17 @@ files = [
 ]
 
 [[package]]
+name = "ordpy"
+version = "1.1.5"
+description = "A Python package for data analysis with permutation entropy and ordinal network methods"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "ordpy-1.1.5-py3-none-any.whl", hash = "sha256:3b2188be35ff75cb0a108ac8cd231e9c247da0410b752d0b12565ef2e7b88abd"},
+    {file = "ordpy-1.1.5.tar.gz", hash = "sha256:a3b85e98739282d44b7e4edd9a4dedc262d4c3eff81789aa1aeb1e0505f9ea99"},
+]
+
+[[package]]
 name = "overrides"
 version = "7.7.0"
 description = "A decorator to automatically detect mismatch when overriding a method."
@@ -4313,4 +4324,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1eeae200e5139d4b30ab33cbc53a63b77109ac9fd82ea56e437de98c2c781fc2"
+content-hash = "b8b484cae3613c463c9cc88f3af45a9c1aa420850acc6c7f1c17313b8a7d4f9b"
