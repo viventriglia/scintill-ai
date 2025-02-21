@@ -12,7 +12,7 @@ from mapie.metrics import (
     regression_mean_width_score,
 )
 
-from scintill_ai import ALPHAS, FCST_HORIZON
+from scintill_ai import ALPHAS, FCST_HORIZON, GAMMA
 
 
 def enbpi_ts_regressor_predict(
@@ -50,11 +50,11 @@ def enbpi_ts_regressor_predict(
 def aci_ts_regressor_predict(
     model: RegressorMixin,
     cv: BlockBootstrap,
-    gamma: float,
     train_data: tuple[pd.DataFrame, pd.Series],
     test_data: tuple[pd.DataFrame, pd.Series],
     alpha_list: list[float] = ALPHAS,
     forecast_horizon: int = FCST_HORIZON,
+    gamma: float = GAMMA,
 ) -> dict:
 
     ts_regressor = fit_mapie_regressor(
