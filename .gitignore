@@ -52,6 +52,7 @@ data/**/*.csv
 data/**/*.min
 data/**/*.txt
 data/**/*.pickle
+data/**/*.parquet
 data/**/*.netcdf
 
 # CatBoost model stuff
