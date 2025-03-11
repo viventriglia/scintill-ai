@@ -25,6 +25,7 @@ mapie = "^0.9.2"
 shap = "^0.46.0"
 ordpy = "^1.1.5"
 catboost = "^1.2.7"
+conformal-tights = "^0.4.0"
 
 
 [build-system]
