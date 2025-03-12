@@ -26,6 +26,7 @@ shap = "^0.46.0"
 ordpy = "^1.1.5"
 catboost = "^1.2.7"
 conformal-tights = "^0.4.0"
+taipy = "^4.0.2"
 
 
 [build-system]
