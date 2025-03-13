@@ -1,24 +1,53 @@
+from pathlib import Path
+
 import pandas as pd
 import taipy.gui as tpg
 
-# mettiamo solo il test set!
-df = (
-    pd.read_parquet("data/out/df.parquet")
+from app.plot import plot_pis
+from app import DATA_PATH
+
+df_aci = (
+    pd.read_parquet(Path(DATA_PATH, "eval_aci.parquet"), engine="pyarrow")
     .reset_index()
     .rename(columns={"index": "timestamp"})
 )
+df_aci["timestamp"] = pd.to_datetime(df_aci["timestamp"], utc=True)
 
-df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+df_cqr_m = (
+    pd.read_parquet(Path(DATA_PATH, "eval_cqr_manina.parquet"), engine="pyarrow")
+    .reset_index()
+    .rename(columns={"index": "timestamp"})
+)
+df_cqr_m["timestamp"] = pd.to_datetime(df_cqr_m["timestamp"], utc=True)
+
+df_cqr_ct = (
+    pd.read_parquet(Path(DATA_PATH, "eval_cqr_ct.parquet"), engine="pyarrow")
+    .reset_index()
+    .rename(columns={"index": "timestamp"})
+)
+df_cqr_ct["timestamp"] = pd.to_datetime(df_cqr_ct["timestamp"], utc=True)
+
+fig_aci = plot_pis(df_aci)
+fig_cqr_m = plot_pis(df_cqr_m)
+fig_cqr_ct = plot_pis(df_cqr_ct)
 
 page = """
-# 📈 Web App con Taipy
+# ✨ Scintill-AI
 
-### 📋 Dataset
-<|{df.head(10_000)}|table|width=100%|>
+### CatBoost + Adaptive Conformal Inference (ACI)
+<|chart|figure={fig_aci}|>
 
-### 📊 Grafico Interattivo
-<|{df.head(10_000)}|chart|x=timestamp|y=s4_mean|type=line|>
+### CatBoost + Conformalised Quantile Regression (CQR)
+<|chart|figure={fig_cqr_ct}|>
+
+### CatBoost + Conformalised Quantile Regression (CQR *a manina*)
+<|chart|figure={fig_cqr_m}|>
 """
 
 if __name__ == "__main__":
-    tpg.Gui(page).run(title="Scintill-AI", dark_mode=True)
+    tpg.Gui(page).run(
+        title="Scintill-AI",
+        dark_mode=True,
+        use_reloader=True,
+        watermark="",
+    )
