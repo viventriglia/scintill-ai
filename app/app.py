@@ -13,13 +13,6 @@ df_aci = (
 )
 df_aci["timestamp"] = pd.to_datetime(df_aci["timestamp"], utc=True)
 
-df_cqr_m = (
-    pd.read_parquet(Path(DATA_PATH, "eval_cqr_manina.parquet"), engine="pyarrow")
-    .reset_index()
-    .rename(columns={"index": "timestamp"})
-)
-df_cqr_m["timestamp"] = pd.to_datetime(df_cqr_m["timestamp"], utc=True)
-
 df_cqr_ct = (
     pd.read_parquet(Path(DATA_PATH, "eval_cqr_ct.parquet"), engine="pyarrow")
     .reset_index()
@@ -27,12 +20,31 @@ df_cqr_ct = (
 )
 df_cqr_ct["timestamp"] = pd.to_datetime(df_cqr_ct["timestamp"], utc=True)
 
+df_aci_5_ahead = (
+    pd.read_parquet(Path(DATA_PATH, "eval_aci_5_ahead.parquet"), engine="pyarrow")
+    .reset_index()
+    .rename(columns={"index": "timestamp"})
+)
+df_aci_5_ahead["timestamp"] = pd.to_datetime(df_aci_5_ahead["timestamp"], utc=True)
+
+df_cqr_ct_5_ahead = (
+    pd.read_parquet(Path(DATA_PATH, "eval_cqr_ct_5_ahead.parquet"), engine="pyarrow")
+    .reset_index()
+    .rename(columns={"index": "timestamp"})
+)
+df_cqr_ct_5_ahead["timestamp"] = pd.to_datetime(
+    df_cqr_ct_5_ahead["timestamp"], utc=True
+)
+
 fig_aci = plot_pis(df_aci)
-fig_cqr_m = plot_pis(df_cqr_m)
 fig_cqr_ct = plot_pis(df_cqr_ct)
+fig_aci_5_ahead = plot_pis(df_aci_5_ahead)
+fig_cqr_ct_5_ahead = plot_pis(df_cqr_ct_5_ahead)
 
 page = """
 # ✨ Scintill-AI
+
+## ⏱️ 1 minute ahead
 
 ### CatBoost + Adaptive Conformal Inference (ACI)
 <|chart|figure={fig_aci}|>
@@ -40,8 +52,13 @@ page = """
 ### CatBoost + Conformalised Quantile Regression (CQR)
 <|chart|figure={fig_cqr_ct}|>
 
-### CatBoost + Conformalised Quantile Regression (CQR *a manina*)
-<|chart|figure={fig_cqr_m}|>
+## ⏱️ 5 minutes ahead
+
+### CatBoost + Adaptive Conformal Inference (ACI)
+<|chart|figure={fig_aci_5_ahead}|>
+
+### CatBoost + Conformalised Quantile Regression (CQR)
+<|chart|figure={fig_cqr_ct_5_ahead}|>
 """
 
 if __name__ == "__main__":
