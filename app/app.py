@@ -1,40 +1,15 @@
 from pathlib import Path
 
-import pandas as pd
 import taipy.gui as tpg
 
 from app.plot import plot_pis
+from app.io import read_model_output
 from app import DATA_PATH
 
-df_aci = (
-    pd.read_parquet(Path(DATA_PATH, "eval_aci.parquet"), engine="pyarrow")
-    .reset_index()
-    .rename(columns={"index": "timestamp"})
-)
-df_aci["timestamp"] = pd.to_datetime(df_aci["timestamp"], utc=True)
-
-df_cqr_ct = (
-    pd.read_parquet(Path(DATA_PATH, "eval_cqr_ct.parquet"), engine="pyarrow")
-    .reset_index()
-    .rename(columns={"index": "timestamp"})
-)
-df_cqr_ct["timestamp"] = pd.to_datetime(df_cqr_ct["timestamp"], utc=True)
-
-df_aci_5_ahead = (
-    pd.read_parquet(Path(DATA_PATH, "eval_aci_5_ahead.parquet"), engine="pyarrow")
-    .reset_index()
-    .rename(columns={"index": "timestamp"})
-)
-df_aci_5_ahead["timestamp"] = pd.to_datetime(df_aci_5_ahead["timestamp"], utc=True)
-
-df_cqr_ct_5_ahead = (
-    pd.read_parquet(Path(DATA_PATH, "eval_cqr_ct_5_ahead.parquet"), engine="pyarrow")
-    .reset_index()
-    .rename(columns={"index": "timestamp"})
-)
-df_cqr_ct_5_ahead["timestamp"] = pd.to_datetime(
-    df_cqr_ct_5_ahead["timestamp"], utc=True
-)
+df_aci = read_model_output(Path(DATA_PATH, "eval_aci.parquet"))
+df_cqr_ct = read_model_output(Path(DATA_PATH, "eval_cqr_ct.parquet"))
+df_aci_5_ahead = read_model_output(Path(DATA_PATH, "eval_aci_5_ahead.parquet"))
+df_cqr_ct_5_ahead = read_model_output(Path(DATA_PATH, "eval_cqr_ct_5_ahead.parquet"))
 
 fig_aci = plot_pis(df_aci)
 fig_cqr_ct = plot_pis(df_cqr_ct)
