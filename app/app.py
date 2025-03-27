@@ -39,7 +39,7 @@ chart_5min = """
 metric_1min = """
 ## CatBoost + Adaptive Conformal Inference (ACI)
 
-<|Aggregated by width|expandable|expanded=False|
+<|Aggregated by PI width|expandable|expanded=False|
 <|{df_aci_1_wc}|table|show_all|width=100%|>
 |>
 
@@ -49,7 +49,7 @@ metric_1min = """
 
 ## CatBoost + Conformalised Quantile Regression (CQR)
 
-<|Aggregated by width|expandable|expanded=False|
+<|Aggregated by PI width|expandable|expanded=False|
 <|{df_cqr_1_wc}|table|show_all|width=100%|>
 |>
 
@@ -61,7 +61,7 @@ metric_1min = """
 metric_5min = """
 ## CatBoost + Adaptive Conformal Inference (ACI)
 
-<|Aggregated by width|expandable|expanded=False|
+<|Aggregated by PI width|expandable|expanded=False|
 <|{df_aci_5_wc}|table|show_all|width=100%|>
 |>
 
@@ -71,7 +71,7 @@ metric_5min = """
 
 ## CatBoost + Conformalised Quantile Regression (CQR)
 
-<|Aggregated by width|expandable|expanded=False|
+<|Aggregated by PI width|expandable|expanded=False|
 <|{df_cqr_5_wc}|table|show_all|width=100%|>
 |>
 

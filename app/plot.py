@@ -64,7 +64,7 @@ def plot_pis(df_eval: pd.DataFrame) -> go.Figure:
     )
 
     fig.update_layout(
-        title=f"Marginal coverage: <b>{marg_cov:.1%}</b> | Conditional coverage (above {SCINT_THR}): <b>{cond_cov:.1%}</b> | Mean interval width: <b>{mean_width:.2f}</b>",
+        title=f"Marginal coverage: <b>{marg_cov:.1%}</b> | Conditional coverage (S4>{SCINT_THR}): <b>{cond_cov:.1%}</b> | Mean PI width: <b>{mean_width:.2f}</b>",
         xaxis_title="",
         yaxis_title="<S4>",
         template="plotly_dark",
