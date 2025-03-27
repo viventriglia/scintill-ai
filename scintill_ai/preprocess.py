@@ -3,6 +3,7 @@ from typing import Literal
 import pandas as pd
 import numpy as np
 import pvlib
+from sklearn.cluster import KMeans
 
 from . import LATITUDE, LONGITUDE, ALTITUDE
 
@@ -155,3 +156,66 @@ def filter_higher_elevs(df: pd.DataFrame, elevation_threshold: float) -> pd.Data
     pd.DataFrame
     """
     return df[df["elev"].ge(elevation_threshold)].reset_index(drop=True)
+
+
+def get_categories(
+    series: pd.Series, window: int = 10, n_categories: int = 3, zero_phase: bool = True
+) -> tuple[pd.Series, np.ndarray]:
+    """
+    Convenience function which filters the time series with a exponentially-weighted
+    moving average (EMA) or with a forward-backward (FB) EMA (if `zero_phase` is set
+    to True); the function then fits a K-Means algorithm and returns the smoothed
+    values along with the estimated labels (categories)
+
+    Parameters
+    ----------
+    series : pd.Series
+        Time series to filter and categorise
+    window : int, optional
+        Time window steps for smoothing, by default 10
+    n_categories : int, optional
+        Number of categories to extract, by default 3
+    zero_phase : bool, optional
+        Whether or not to make the filter zero-phase (i.e., a non-causal filter),
+        by default True; if the filter is zero-phase, the smoothed series is not
+        appropriate for prediction due to data leakage from future values
+
+    Returns
+    -------
+    tuple[pd.Series, np.ndarray]
+        Smoothed series, estimated labels (categories)
+    """
+    filtered_series = series.ewm(span=window).mean()
+
+    if zero_phase:
+        # Backward filtering as well
+        filtered_series = filtered_series[::-1].ewm(span=window).mean()[::-1]
+
+    zeroes = filtered_series.lt(0).sum() > 0
+
+    # Evaluate log-differences (with an offset in case of negative values)
+    if not zeroes:
+        log_diff = np.diff(np.log1p(filtered_series.values))
+    else:
+        log_diff = np.diff(
+            np.log1p(filtered_series.values + abs(filtered_series.min()))
+        )
+
+    # Fit the clustering model
+    km = KMeans(n_clusters=n_categories, n_init="auto", random_state=42).fit(
+        log_diff.reshape(-1, 1)
+    )
+    lb = km.labels_
+
+    # Change the labels to get some semblance of order
+    cluster_centers = km.cluster_centers_.flatten()
+    temp = [(cluster_centers[i], i) for i in range(n_categories)]
+    temp = sorted(temp, key=lambda x: x[0])
+
+    labels = np.zeros(len(lb), dtype=int)
+    for i in range(1, n_categories):
+        old_lb = temp[i][1]
+        idx = np.where(lb == old_lb)[0]
+        labels[idx] = i
+
+    return filtered_series, labels
