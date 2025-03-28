@@ -1,11 +1,11 @@
-from typing import Literal
+from typing import Literal, Iterable
 
 import pandas as pd
 import numpy as np
 import pvlib
 from sklearn.cluster import KMeans
 
-from . import LATITUDE, LONGITUDE, ALTITUDE
+from . import LATITUDE, LONGITUDE, ALTITUDE, H_START, H_STOP
 
 
 def get_solar_position(
@@ -219,3 +219,71 @@ def get_categories(
         labels[idx] = i
 
     return filtered_series, labels
+
+
+def get_time_filtering_and_features(
+    df: pd.DataFrame,
+    hour_start: int = H_START,
+    hour_stop: int = H_STOP,
+    ema_cols: dict[str, Iterable[int]] = None,
+    lag_cols: dict[str, Iterable[int]] = None,
+) -> pd.DataFrame:
+    """
+    Filters the input DataFrame by time and adds exponential moving average (EMA) and lagged features
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame containing a datetime index
+    hour_start : int, optional
+        Starting hour for filtering, by default 20
+        The function filters out rows where the hour is before this value
+    hour_stop : int, optional
+        Ending hour for filtering, by default 6
+        The function filters out rows where the hour is after this value
+    ema_cols : dict[str, Iterable[int]], optional
+        Dictionary where keys are column names and values are lists of integers specifying
+        the windows (in minutes) for which to compute the EMAs; if not provided, no EMAs
+        are computed
+    lag_cols : dict[str, Iterable[int]], optional
+        Dictionary where keys are column names and values are lists of integers specifying
+        the time lags (in minutes) for which to compute theri lagged versions; if not provided,
+        no lag features are computed
+
+    Returns
+    -------
+    pd.DataFrame
+        Time-filtered DataFrame with the added EMA and/or lag features, if any
+    """
+    max_window = max(
+        max([max(v) for v in ema_cols.values()], default=0) if ema_cols else 0,
+        max([max(v) for v in lag_cols.values()], default=0) if lag_cols else 0,
+    )
+    hrs_, mins_ = divmod(max_window, 60)
+
+    # Pre-filtering
+    df = df[
+        (df.index.hour > hour_start - 1)
+        | (df.index.hour < hour_stop)
+        | (
+            (df.index.hour == (hour_start - 1 - hrs_))
+            & (df.index.minute >= (60 - mins_))
+        )
+    ].copy()
+
+    # EMAs
+    if ema_cols is not None:
+        for col, windows in ema_cols.items():
+            for w in windows:
+                df[f"{col}_ema_{w}m"] = df[col].ewm(span=w).mean()
+
+    # Lags
+    if lag_cols is not None:
+        for col, windows in lag_cols.items():
+            for w in windows:
+                df[f"{col}_lag_{w}m"] = df[col].shift(w)
+
+    # Filtering
+    df = df[(df.index.hour >= hour_start) | (df.index.hour < hour_stop)]
+
+    return df

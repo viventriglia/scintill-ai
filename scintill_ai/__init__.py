@@ -21,3 +21,7 @@ DATA_IN: Path = Path("..", "data", "in")
 ALPHAS = [1 - 0.80, 1 - 0.90, 1 - 0.95]
 FCST_HORIZON = 5
 GAMMA = 0.05
+
+# Time filtering for the dataset
+H_START = 20
+H_STOP = 6
