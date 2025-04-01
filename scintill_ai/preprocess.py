@@ -262,14 +262,21 @@ def get_time_filtering_and_features(
     hrs_, mins_ = divmod(max_window, 60)
 
     # Pre-filtering
-    df = df[
-        (df.index.hour > hour_start - 1)
-        | (df.index.hour < hour_stop)
-        | (
-            (df.index.hour == (hour_start - 1 - hrs_))
-            & (df.index.minute >= (60 - mins_))
+    if hour_start > hour_stop:
+        pre_filter = (
+            (df.index.hour > hour_start - 1)
+            | (df.index.hour < hour_stop)
+            | (
+                (df.index.hour == (hour_start - 1 - hrs_))
+                & (df.index.minute >= (60 - mins_))
+            )
         )
-    ].copy()
+    else:
+        pre_filter = (df.index.hour >= (hour_start - hrs_)) & (
+            df.index.hour < hour_stop
+        )
+
+    df = df[pre_filter].copy()
 
     # EMAs
     if ema_cols is not None:
@@ -284,6 +291,9 @@ def get_time_filtering_and_features(
                 df[f"{col}_lag_{w}m"] = df[col].shift(w)
 
     # Filtering
-    df = df[(df.index.hour >= hour_start) | (df.index.hour < hour_stop)]
+    if hour_start > hour_stop:
+        df = df[(df.index.hour >= hour_start) | (df.index.hour < hour_stop)]
+    else:
+        df = df[(df.index.hour >= hour_start) & (df.index.hour < hour_stop)]
 
     return df
