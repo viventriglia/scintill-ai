@@ -55,8 +55,9 @@ data/**/*.pickle
 data/**/*.parquet
 data/**/*.netcdf
 
-# CatBoost model stuff
+# CatBoost model and other stuff
 jupyters/catboost_info/*
+jupyters/lightning_logs/*
 
 # MLFlow stuff (commit only a specific model)
 # /mlruns/*
