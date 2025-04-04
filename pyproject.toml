@@ -27,6 +27,7 @@ ordpy = "^1.1.5"
 catboost = "^1.2.7"
 conformal-tights = "^0.4.0"
 taipy = "^4.0.2"
+neuralforecast = "^3.0.0"
 
 
 [build-system]
