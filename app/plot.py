@@ -2,19 +2,12 @@ import plotly.graph_objects as go
 import pandas as pd
 
 from app import SCINT_THR
+from app.utils import evaluate_metrics
 
 
 def plot_pis(df_eval: pd.DataFrame) -> go.Figure:
     out_of_pi = df_eval[df_eval["is_covered"].eq(False)]
-    marg_cov = df_eval["is_covered"].sum() / df_eval.shape[0]
-    cond_cov = (
-        df_eval[
-            (df_eval["y_test"].gt(SCINT_THR))
-            & (df_eval["y_test"].le(df_eval["y_pred_hig"]))
-        ].shape[0]
-        / df_eval[(df_eval["y_test"].gt(SCINT_THR))].shape[0]
-    )
-    mean_width = (df_eval["y_pred_hig"] - df_eval["y_pred_low"]).mean()
+    metrics = evaluate_metrics(df_eval)
 
     fig = go.Figure()
 
@@ -64,7 +57,7 @@ def plot_pis(df_eval: pd.DataFrame) -> go.Figure:
     )
 
     fig.update_layout(
-        title=f"Marginal coverage: <b>{marg_cov:.1%}</b> | Conditional coverage (S4>{SCINT_THR}): <b>{cond_cov:.1%}</b> | Mean PI width: <b>{mean_width:.2f}</b>",
+        title=f"Marginal coverage: <b>{metrics['marg_cov']:.1%}</b> | Conditional coverage (S4>{SCINT_THR}): <b>{metrics['cond_cov']:.1%}</b> | Mean PI width: <b>{metrics['mean_width']:.2f}</b>",
         xaxis_title="",
         yaxis_title="<S4>",
         template="plotly_dark",
